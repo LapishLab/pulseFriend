@@ -43,7 +43,7 @@ void runStim(Params params) {
   for (int i=0; i<params.trainRepeats; i++){
     Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
     runTrain(params);
-    delay(params.trainDelay);
+    delay(params.trainDelay/ms);
   }
 }
 
@@ -61,8 +61,8 @@ void runTrain(Params params) {
     digitalWrite(outWidePin, HIGH);
     delayMicroseconds(params.pulseDur);
     digitalWrite(outPin, LOW);
-    delay(params.widePulseDur);
+    delayMicroseconds(params.widePulseDur);
     digitalWrite(outWidePin, LOW);
-    delay(params.pulseDelay);
+    delay(params.pulseDelay/ms);g
   }
 }
