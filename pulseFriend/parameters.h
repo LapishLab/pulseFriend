@@ -26,9 +26,10 @@ Params session4;
 void loadSettings(){
 
   /// Session 1 ///
-  //session1.pulseDur = 1;
+  session1.pulseDur = 100*ms;
 
   /// Session 2 ///
+  session2.pulseRepeats = 10;
 
   /// Session 3 ///
 

@@ -22,13 +22,13 @@ void setup() {
 void loop() {
   if (buttonIsPressed()) {
     Serial.println("Button pressed!");
-    Serial.println("running session1");
+    Serial.println("---- Session 1 ----");
     runStim(session1);
-    Serial.println("running session2");
+    Serial.println("---- Session 2 ----");
     runStim(session2);
-    Serial.println("running session3");
+    Serial.println("---- Session 3 ----");
     runStim(session3);
-    Serial.println("running session4");
+    Serial.println("---- Session 4 ----");
     runStim(session4);
   }
 }
@@ -56,7 +56,7 @@ void runStim(Params params) {
 
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
-    Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+    //Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
     digitalWrite(outPin, HIGH);
     digitalWrite(outWidePin, HIGH);
     flexibleDelay(params.pulseDur);
