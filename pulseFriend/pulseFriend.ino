@@ -28,8 +28,13 @@ void loop() {
     runStim(session2);
     Serial.println("---- Session 3 ----");
     runStim(session3);
+
+    delay(10*minute);
+
     Serial.println("---- Session 4 ----");
     runStim(session4);
+    Serial.println("---- Session 5 ----");
+    runStim(session5);
   }
 }
 
@@ -56,7 +61,7 @@ void runStim(Params params) {
 
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
-    //Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+    Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
     PORTB = B00000011; // Turn on pin 8 and 9 (direct port manipulation)
     flexibleDelay(params.pulseDur);
     PORTB = B00000010; // turn off pin 8 (direct port manipulation)
