@@ -9,9 +9,9 @@ const unsigned long minute = s*60;
 struct Params {
   unsigned long pulseDur = 200*us;
   unsigned long pulseDelay = 400*ms; 
-  unsigned long pulseRepeats = 10;
+  byte pulseRepeats = 10;
   unsigned long trainDelay = 2*s;
-  unsigned long trainRepeats = 2;
+  byte trainRepeats = 2;
   unsigned long widePulseDur = 500*ms; //Actually implemented as additional time on top of pulse duration
 };
 
