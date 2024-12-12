@@ -2,8 +2,7 @@
 #include "parameters.h"
 
 // Pins
-const int startButtonPin = 53;
-//const int stopButtonPin = 2;
+const int startButtonPin = 2;
 const int outPin = 45; 
 const int outWidePin = 43;
 
@@ -63,6 +62,6 @@ void runTrain(Params params) {
     digitalWrite(outPin, LOW);
     delayMicroseconds(params.widePulseDur);
     digitalWrite(outWidePin, LOW);
-    delay(params.pulseDelay/ms);g
+    delay(params.pulseDelay/ms);
   }
 }
