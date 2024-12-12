@@ -1,12 +1,5 @@
-// User Settings %%
-const int pulseDur = 200; // In microseconds
-const int pulseDelay = 400; 
-const int pulseRepeats = 10;
-const int trainDelay = 2000;
-const int trainRepeats = 2;
 
-// Developer Settings %%
-const int widePulseDur = 200; //Currently additional time on top of pulse duration
+#include "parameters.h"
 
 // Pins
 const int startButtonPin = 53;
@@ -23,13 +16,21 @@ void setup() {
   pinMode(outPin, OUTPUT);
   pinMode(outWidePin, OUTPUT);
   pinMode(startButtonPin, INPUT);
+  loadSettings();
   Serial.println("Setup finished");
 }
 
 void loop() {
   if (buttonIsPressed()) {
-    Serial.println("Button pressed!, running stim");
-    runStim();
+    Serial.println("Button pressed!");
+    Serial.println("running session1");
+    runStim(session1);
+    Serial.println("running session2");
+    runStim(session2);
+    Serial.println("running session3");
+    runStim(session3);
+    Serial.println("running session4");
+    runStim(session4);
   }
 }
 
@@ -38,17 +39,17 @@ bool buttonIsPressed() {
   return buttonState == HIGH;
 }
 
-void runStim() {
-  for (int i=0; i<trainRepeats; i++){
-    Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(trainRepeats);
-    runTrain();
-    delay(trainDelay);
+void runStim(Params params) {
+  for (int i=0; i<params.trainRepeats; i++){
+    Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
+    runTrain(params);
+    delay(params.trainDelay);
   }
 }
 
-void runTrain() {
-  for (int i=0; i<pulseRepeats; i++){
-    Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(pulseRepeats);
+void runTrain(Params params) {
+  for (int i=0; i<params.pulseRepeats; i++){
+    Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
 
     // This is just to trigger the oscilloscipe ///
     digitalWrite(outPin, HIGH);
@@ -58,10 +59,10 @@ void runTrain() {
     //////////////////////////////////////////////
     digitalWrite(outPin, HIGH);
     digitalWrite(outWidePin, HIGH);
-    delayMicroseconds(pulseDur);
+    delayMicroseconds(params.pulseDur);
     digitalWrite(outPin, LOW);
-    delay(widePulseDur);
+    delay(params.widePulseDur);
     digitalWrite(outWidePin, LOW);
-    delay(pulseDelay);
+    delay(params.pulseDelay);
   }
 }
