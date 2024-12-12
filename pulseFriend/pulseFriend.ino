@@ -3,8 +3,8 @@
 
 // Pins
 const int startButtonPin = 2;
-const int outPin = 7; 
-const int outWidePin = 8;
+const int outPin = 8; 
+const int outWidePin = 9;
 
 // State
 // bool shouldContinue = TRUE
@@ -38,12 +38,19 @@ bool buttonIsPressed() {
   return buttonState == HIGH;
 }
 
+void flexibleDelay(unsigned long t) {
+  if (t < 4000) {
+    delayMicroseconds(t);
+  } else {
+    delay(t/ms);
+  }
+}
+
 void runStim(Params params) {
   for (int i=0; i<params.trainRepeats; i++){
     Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
     runTrain(params);
-    delay(params.trainDelay/ms);
-    Serial.println(params.trainDelay/ms);
+    flexibleDelay(params.trainDelay);
   }
 }
 
@@ -52,10 +59,10 @@ void runTrain(Params params) {
     Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
     digitalWrite(outPin, HIGH);
     digitalWrite(outWidePin, HIGH);
-    delayMicroseconds(params.pulseDur);
+    flexibleDelay(params.pulseDur);
     digitalWrite(outPin, LOW);
-    delayMicroseconds(params.widePulseDur);
+    flexibleDelay(params.widePulseDur);
     digitalWrite(outWidePin, LOW);
-    delay(params.pulseDelay/ms);
+    flexibleDelay(params.pulseDelay);
   }
 }
