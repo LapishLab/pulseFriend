@@ -12,7 +12,7 @@ struct Params {
   byte pulseRepeats = 5;
   unsigned long trainDelay = 1*s;
   byte trainRepeats = 2;
-  unsigned long widePulseDur = 100*ms; //Actually implemented as additional time on top of pulse duration
+  unsigned long widePulseDur = 100*ms; //This needs to be equal or longer than pulseDur or you will get weird results
 };
 
 //// Create an instance for each session
@@ -32,7 +32,11 @@ void loadSettings(){
   session2.pulseRepeats = 10;
 
   /// Session 3 ///
+  session3.pulseDur = 100*ms;
+  session3.widePulseDur = 100*ms;
 
   /// Session 4 ///
+  session4.pulseRepeats=1;
+  session4.trainRepeats=1;
   
 }

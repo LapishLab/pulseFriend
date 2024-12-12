@@ -57,12 +57,11 @@ void runStim(Params params) {
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
     //Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
-    digitalWrite(outPin, HIGH);
-    digitalWrite(outWidePin, HIGH);
+    PORTB = B00000011; // Turn on pin 8 and 9 (direct port manipulation)
     flexibleDelay(params.pulseDur);
-    digitalWrite(outPin, LOW);
-    flexibleDelay(params.widePulseDur);
-    digitalWrite(outWidePin, LOW);
+    PORTB = B00000010; // turn off pin 8 (direct port manipulation)
+    flexibleDelay(params.widePulseDur-params.pulseDur);
+    PORTB = B00000000; // turn off pin 9 (direct port manipulation)
     flexibleDelay(params.pulseDelay);
   }
 }
