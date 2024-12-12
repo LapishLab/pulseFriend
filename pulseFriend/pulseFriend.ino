@@ -3,8 +3,8 @@
 
 // Pins
 const int startButtonPin = 2;
-const int outPin = 45; 
-const int outWidePin = 43;
+const int outPin = 7; 
+const int outWidePin = 8;
 
 // State
 // bool shouldContinue = TRUE
@@ -43,19 +43,13 @@ void runStim(Params params) {
     Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
     runTrain(params);
     delay(params.trainDelay/ms);
+    Serial.println(params.trainDelay/ms);
   }
 }
 
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
     Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
-
-    // This is just to trigger the oscilloscipe ///
-    digitalWrite(outPin, HIGH);
-    delay(5);
-    digitalWrite(outPin, LOW);
-    delayMicroseconds(200);
-    //////////////////////////////////////////////
     digitalWrite(outPin, HIGH);
     digitalWrite(outWidePin, HIGH);
     delayMicroseconds(params.pulseDur);

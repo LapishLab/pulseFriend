@@ -1,18 +1,18 @@
 //// All parameter times are in microseconds, but I've defined larger time units for your convenience.
 // Use them like this: session1.pulseDur = 1*ms;
-const byte us = 1;
-const unsigned int ms = 1000;
+const unsigned long us = 1;
+const unsigned long ms = 1000;
 const unsigned long s = ms*1000;
 const unsigned long minute = s*60;
 
 //// Define a structure to hold session parameters and set default values ////
 struct Params {
-  int pulseDur = 200*us;
-  int pulseDelay = 400*ms; 
-  int pulseRepeats = 10;
-  int trainDelay = 2*s;
-  int trainRepeats = 2;
-  int widePulseDur = 200*ms; //Actually implemented as additional time on top of pulse duration
+  unsigned long pulseDur = 200*us;
+  unsigned long pulseDelay = 400*ms; 
+  unsigned long pulseRepeats = 10;
+  unsigned long trainDelay = 2*s;
+  unsigned long trainRepeats = 2;
+  unsigned long widePulseDur = 500*ms; //Actually implemented as additional time on top of pulse duration
 };
 
 //// Create an instance for each session
