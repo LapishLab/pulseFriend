@@ -8,11 +8,11 @@ const unsigned long minute = s*60;
 //// Define a structure to hold session parameters and set default values ////
 struct Params {
   unsigned long pulseDur = 200*us;
-  unsigned long pulseDelay = 20*s; 
+  unsigned long pulseDelay = 20*s;   //This needs to be equal or longer than widePulseDur or you will get weird results
   byte pulseRepeats = 60;
   unsigned long trainDelay = 0*s;
   byte trainRepeats = 1;
-  unsigned long widePulseDur = 100*ms; //This needs to be equal or longer than pulseDur or you will get weird results
+  unsigned long widePulseDur = 2*ms; //This needs to be equal or longer than pulseDur or you will get weird results
 };
 
 //// Create an instance for each session
