@@ -24,6 +24,8 @@ void loop() {
     Serial.println("Button pressed!");
     Serial.println("---- Session 1 ----");
     runStim(session1);
+    Serial.println("---- GIVE INJECTION!!!!!----");
+    flexibleDelay(20*s);
     Serial.println("---- Session 2 ----");
     runStim(session2);
     Serial.println("---- Session 3 ----");
@@ -61,12 +63,13 @@ void runStim(Params params) {
 
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
-    Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+    //Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
     PORTB = B00000011; // Turn on pin 8 and 9 (direct port manipulation)
     flexibleDelay(params.pulseDur);
     PORTB = B00000010; // turn off pin 8 (direct port manipulation)
     flexibleDelay(params.widePulseDur-params.pulseDur);
     PORTB = B00000000; // turn off pin 9 (direct port manipulation)
-    flexibleDelay(params.pulseDelay);
+    //flexibleDelay(params.pulseDelay);// Not what we really want. Actually want to start wait timer after the end of the short pulse.  
+    flexibleDelay(params.pulseDelay+params.pulseDur-params.widePulseDur); //Need to make sure pulseDelay is bigger than wide PulseDur
   }
 }
