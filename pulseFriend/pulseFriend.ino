@@ -29,7 +29,7 @@ void loop() {
     Serial.println("---- Session 3 ----");
     runStim(session3);
 
-    delay(10*minute);
+    flexibleDelay(10*minute);
 
     Serial.println("---- Session 4 ----");
     runStim(session4);
