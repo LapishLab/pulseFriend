@@ -10,7 +10,7 @@ struct Params {
   unsigned long pulseDur = 200*us;
   unsigned long pulseDelay = 10*s; 
   byte pulseRepeats = 10;
-  unsigned long trainDelay = 60*s;
+  unsigned long trainDelay = 20*s;
   byte trainRepeats = 10;
   unsigned long widePulseDur = 100*ms; //This needs to be equal or longer than pulseDur or you will get weird results
 };
