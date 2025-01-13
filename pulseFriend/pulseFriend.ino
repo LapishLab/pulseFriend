@@ -22,20 +22,20 @@ void setup() {
 void loop() {
   if (buttonIsPressed()) {
     Serial.println("Button pressed!");
-    Serial.println("---- Session 1 ----");
+    Serial.println("---- Session 1 (Baseline pre-injection)----");
     runStim(session1);
     Serial.println("---- GIVE INJECTION!!!!!----");
     flexibleDelay(20*s);
-    Serial.println("---- Session 2 ----");
+    Serial.println("---- Session 2 (Baseline post-injection)----");
     runStim(session2);
-    Serial.println("---- Session 3 ----");
+    Serial.println("---- Session 3 (High-frequency #1) ----");
     runStim(session3);
 
     flexibleDelay(10*minute);
 
-    Serial.println("---- Session 4 ----");
+    Serial.println("---- Session 4 (High-frequency #2) ----");
     runStim(session4);
-    Serial.println("---- Session 5 ----");
+    Serial.println("---- Session 5 (Test post-high-frequency) ----");
     runStim(session5);
   }
 }
