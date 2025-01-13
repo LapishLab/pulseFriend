@@ -13,6 +13,7 @@ struct Params {
   unsigned long trainDelay = 0*s;
   byte trainRepeats = 1;
   unsigned long widePulseDur = 2*ms; //This needs to be equal or longer than pulseDur or you will get weird results
+  bool shouldPrintPulse = true;
 };
 
 //// Create an instance for each session
@@ -27,7 +28,7 @@ Params session5;
 void loadSettings(){
 
   /// Session 1 ///
-  //session1.pulseDur = 100*ms;
+  // using all defaults
 
   /// Session 2 ///
   session2.pulseRepeats = 90;
@@ -37,6 +38,7 @@ void loadSettings(){
   session3.pulseRepeats = 50;
   session3.trainDelay = 10*s;
   session3.trainRepeats = 10;
+  session3.shouldPrintPulse = false;
 
   //pause for 10minutes
 
@@ -45,8 +47,8 @@ void loadSettings(){
   session4.pulseRepeats = 50;
   session4.trainDelay = 10*s;
   session4.trainRepeats = 10;
+  session4.shouldPrintPulse = false;
 
   /// Session 5 ///
   session5.pulseRepeats = 100; 
-  
 }

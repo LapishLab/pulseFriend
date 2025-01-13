@@ -55,7 +55,7 @@ void flexibleDelay(unsigned long t) {
 
 void runStim(Params params) {
   for (int i=0; i<params.trainRepeats; i++){
-    Serial.print("Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
+    Serial.print("    Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
     runTrain(params);
     flexibleDelay(params.trainDelay);
   }
@@ -63,7 +63,9 @@ void runStim(Params params) {
 
 void runTrain(Params params) {
   for (int i=0; i<params.pulseRepeats; i++){
-    //Serial.print("Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+    if (params.shouldPrintPulse){
+      Serial.print("        Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+    }
     PORTB = B00000011; // Turn on pin 8 and 9 (direct port manipulation)
     flexibleDelay(params.pulseDur);
     PORTB = B00000010; // turn off pin 8 (direct port manipulation)
