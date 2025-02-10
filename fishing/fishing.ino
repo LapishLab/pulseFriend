@@ -57,6 +57,6 @@ void runTrain(Params params) {
     flexibleDelay(params.widePulseDur-params.pulseDur);
     PORTB = B00000000; // turn off pin 9 (direct port manipulation)
     //flexibleDelay(params.pulseDelay);// Not what we really want. Actually want to start wait timer after the end of the short pulse. 
-    flexibleDelay(params.pulseDelay-params.widePulseDur);
+    flexibleDelay(params.pulseDelay+params.pulseDur-params.widePulseDur); //Need to make sure pulseDelay is bigger than wide PulseDur
   }
 }
