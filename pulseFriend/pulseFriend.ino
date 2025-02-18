@@ -31,6 +31,7 @@ void loop() {
     Serial.println("---- Session 3 (High-frequency #1) ----");
     runStim(session3);
 
+    Serial.println("---- Waiting for 10 minutes ----");
     flexibleDelay(10*minute);
 
     Serial.println("---- Session 4 (High-frequency #2) ----");
