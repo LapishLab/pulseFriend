@@ -5,18 +5,35 @@ const unsigned long ms = 1000;
 const unsigned long s = ms*1000;
 const unsigned long minute = s*60;
 
-//// Define a structure to hold session parameters and set default values ////
+//// default values for each session ////
 struct Params {
-  unsigned long pulseDur = 200*us;
-  unsigned long pulseDelay = 20*s;   //This needs to be equal or longer than widePulseDur or you will get weird results
-  byte pulseRepeats = 60;
+  //// Duration of pulse sent to stimulator ////
+  unsigned long pulseDur = 500; 
+
+  //// Duration of pulse sent to open ephys ////
+  // This needs to be equal or longer than pulseDur or you will get weird results
+  unsigned long widePulseDur = 500*us; 
+
+  //// Delay between the start of each pulse ////
+  // This needs to be equal or longer than widePulseDur or you will get weird results
+  unsigned long pulseDelay = 10*ms;   
+
+  //// Number of pulses per train ///
+  // total time  = pulseRepeats x pulseDelay
+  byte pulseRepeats = 1000;
+
+  //// Delay between pulse trains ////
   unsigned long trainDelay = 0*s;
+
+  //// Number of pulse trains in this session ////
   byte trainRepeats = 1;
-  unsigned long widePulseDur = 2*ms; //This needs to be equal or longer than pulseDur or you will get weird results
-  bool shouldPrintPulse = true;
+
+  //// Should I print "running pulse" to the serial monitor after each pulse? ////
+  //Turn this to false if doing really fast pulses for performance reasons and to prevent clogging up serial monitor
+  bool shouldPrintPulse = true; 
 };
 
-//// Create an instance for each session
+//// Create an instance for each session (define more sessions if needed and add them to the main loop function with runstim() )
 Params session1;
 Params session2;
 Params session3;
@@ -26,9 +43,8 @@ Params session5;
 
 ////////////// Define custom parameters for each setting ///////////////////////////////
 void loadSettings(){
-
   /// Session 1 ///
-  // using all defaults
+  //using all defaults
 
   /// Session 2 ///
   session2.pulseRepeats = 90;
