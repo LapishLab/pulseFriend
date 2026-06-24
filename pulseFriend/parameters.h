@@ -5,66 +5,25 @@ const unsigned long ms = 1000;
 const unsigned long s = ms*1000;
 const unsigned long minute = s*60;
 
-//// default values for each session ////
 struct Params {
-  //// Duration of pulse sent to stimulator ////
-  unsigned long pulseDur = 500; 
-
-  //// Duration of pulse sent to open ephys ////
-  // This needs to be equal or longer than pulseDur or you will get weird results
-  unsigned long widePulseDur = 500*us; 
-
-  //// Delay between the start of each pulse ////
-  // This needs to be equal or longer than widePulseDur or you will get weird results
-  unsigned long pulseDelay = 10*ms;   
-
-  //// Number of pulses per train ///
-  // total time  = pulseRepeats x pulseDelay
-  byte pulseRepeats = 1000;
-
-  //// Delay between pulse trains ////
-  unsigned long trainDelay = 0*s;
-
-  //// Number of pulse trains in this session ////
-  byte trainRepeats = 1;
-
-  //// Should I print "running pulse" to the serial monitor after each pulse? ////
-  //Turn this to false if doing really fast pulses for performance reasons and to prevent clogging up serial monitor
-  bool shouldPrintPulse = true; 
+  unsigned long pulseDur = 20*us;       // pulse to trigger the stimulator
+  unsigned long widePulseDur = 50*us;   // pulse to open ephys
+  unsigned long pulseDelay = 10*ms;     // interpulse interval
+  unsigned int pulseRepeats = 1000;     // total number of pulses
+  unsigned long trainDelay = 0*ms;
+  unsigned int trainRepeats = 1;
+  bool shouldPrintPulse = false;
 };
 
-//// Create an instance for each session (define more sessions if needed and add them to the main loop function with runstim() )
 Params session1;
-Params session2;
-Params session3;
-Params session4;
-Params session5;
 
 
-////////////// Define custom parameters for each setting ///////////////////////////////
 void loadSettings(){
-  /// Session 1 ///
-  //using all defaults
-
-  /// Session 2 ///
-  session2.pulseRepeats = 90;
-
-  /// Session 3 ///
-  session3.pulseDelay = 3800*us;
-  session3.pulseRepeats = 50;
-  session3.trainDelay = 10*s;
-  session3.trainRepeats = 10;
-  session3.shouldPrintPulse = false;
-
-  //pause for 10minutes
-
-  /// Session 4 ///
-  session4.pulseDelay =3800*us;
-  session4.pulseRepeats = 50;
-  session4.trainDelay = 10*s;
-  session4.trainRepeats = 10;
-  session4.shouldPrintPulse = false;
-
-  /// Session 5 ///
-  session5.pulseRepeats = 100; 
+  session1.pulseDur = 20*us;
+  session1.widePulseDur = 50*us;
+  session1.pulseDelay = 10*ms;
+  session1.pulseRepeats = 1000;
+  session1.trainDelay = 0*ms;
+  session1.trainRepeats = 1;
+  session1.shouldPrintPulse = false;
 }

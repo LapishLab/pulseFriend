@@ -1,4 +1,3 @@
-
 #include "parameters.h"
 
 // Pins
@@ -6,38 +5,32 @@ const int startButtonPin = 2;
 const int outPin = 8; 
 const int outWidePin = 9;
 
-// State
-// bool shouldContinue = TRUE
-
 void setup() {
   Serial.begin(9600);
   Serial.println("Starting setup");
+
   pinMode(outPin, OUTPUT);
   pinMode(outWidePin, OUTPUT);
   pinMode(startButtonPin, INPUT);
+
   loadSettings();
+
   Serial.println("Setup finished");
 }
 
 void loop() {
   if (buttonIsPressed()) {
     Serial.println("Button pressed!");
-    Serial.println("---- Session 1 (Baseline pre-injection)----");
+    Serial.println("---- Running simple 10-second pulse train ----");
+
     runStim(session1);
-    Serial.println("---- GIVE INJECTION!!!!!----");
-    flexibleDelay(20*s);
-    Serial.println("---- Session 2 (Baseline post-injection)----");
-    runStim(session2);
-    Serial.println("---- Session 3 (High-frequency #1) ----");
-    runStim(session3);
 
-    Serial.println("---- Waiting for 10 minutes ----");
-    flexibleDelay(10*minute);
+    Serial.println("---- Pulse train finished ----");
 
-    Serial.println("---- Session 4 (High-frequency #2) ----");
-    runStim(session4);
-    Serial.println("---- Session 5 (Test post-high-frequency) ----");
-    runStim(session5);
+    // Prevent repeated stimulation while button is still held down
+    while (buttonIsPressed()) {
+      delay(10);
+    }
   }
 }
 
@@ -50,29 +43,41 @@ void flexibleDelay(unsigned long t) {
   if (t < 4000) {
     delayMicroseconds(t);
   } else {
-    delay(t/ms);
+    delay(t / ms);
   }
 }
 
 void runStim(Params params) {
-  for (int i=0; i<params.trainRepeats; i++){
-    Serial.print("    Running Train #"); Serial.print(i+1); Serial.print("/");Serial.println(params.trainRepeats);
+  for (unsigned int i = 0; i < params.trainRepeats; i++) {
+    Serial.print("Running Train #");
+    Serial.print(i + 1);
+    Serial.print("/");
+    Serial.println(params.trainRepeats);
+
     runTrain(params);
+
     flexibleDelay(params.trainDelay);
   }
 }
 
 void runTrain(Params params) {
-  for (int i=0; i<params.pulseRepeats; i++){
-    if (params.shouldPrintPulse){
-      Serial.print("        Running pulse #"); Serial.print(i+1); Serial.print("/");Serial.println(params.pulseRepeats);
+  for (unsigned int i = 0; i < params.pulseRepeats; i++) {
+    if (params.shouldPrintPulse) {
+      Serial.print("Running pulse #");
+      Serial.print(i + 1);
+      Serial.print("/");
+      Serial.println(params.pulseRepeats);
     }
-    PORTB = B00000011; // Turn on pin 8 and 9 (direct port manipulation)
+
+    PORTB = B00000011; // Turn on pin 8 and pin 9
     flexibleDelay(params.pulseDur);
-    PORTB = B00000010; // turn off pin 8 (direct port manipulation)
-    flexibleDelay(params.widePulseDur-params.pulseDur);
-    PORTB = B00000000; // turn off pin 9 (direct port manipulation)
-    //flexibleDelay(params.pulseDelay);// Not what we really want. Actually want to start wait timer after the end of the short pulse.  
-    flexibleDelay(params.pulseDelay+params.pulseDur-params.widePulseDur); //Need to make sure pulseDelay is bigger than wide PulseDur
+
+    PORTB = B00000010; // Turn off pin 8, keep pin 9 on
+    flexibleDelay(params.widePulseDur - params.pulseDur);
+
+    PORTB = B00000000; // Turn off pin 9
+
+    // Wait until the next pulse start
+    flexibleDelay(params.pulseDelay - params.widePulseDur);
   }
 }
