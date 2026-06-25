@@ -2,8 +2,8 @@
 
 // Pins
 const int startButtonPin = 2;
-const int outPin = 8; 
-const int outWidePin = 9;
+const int outPin = 8;       // TTL command pulse to WPI A365
+const int outWidePin = 9;   // wider pulse, for ephys trigger/gate
 
 void setup() {
   Serial.begin(9600);
@@ -13,6 +13,9 @@ void setup() {
   pinMode(outWidePin, OUTPUT);
   pinMode(startButtonPin, INPUT);
 
+  digitalWrite(outPin, LOW);
+  digitalWrite(outWidePin, LOW);
+
   loadSettings();
 
   Serial.println("Setup finished");
@@ -21,7 +24,7 @@ void setup() {
 void loop() {
   if (buttonIsPressed()) {
     Serial.println("Button pressed!");
-    Serial.println("---- Running simple 10-second pulse train ----");
+    Serial.println("---- Running biphasic pulse train ----");
 
     runStim(session1);
 
@@ -63,21 +66,33 @@ void runStim(Params params) {
 void runTrain(Params params) {
   for (unsigned int i = 0; i < params.pulseRepeats; i++) {
     if (params.shouldPrintPulse) {
-      Serial.print("Running pulse #");
+      Serial.print("Running biphasic pulse pair #");
       Serial.print(i + 1);
       Serial.print("/");
       Serial.println(params.pulseRepeats);
     }
 
-    PORTB = B00000011; // Turn on pin 8 and pin 9
+    // Phase 1
+    // Pin 8 HIGH sends command pulse to A365.
+    // Pin 9 HIGH opens the wider ephys gate.
+    PORTB = B00000011;   // Turn on pin 8 and pin 9
     flexibleDelay(params.pulseDur);
 
-    PORTB = B00000010; // Turn off pin 8, keep pin 9 on
-    flexibleDelay(params.widePulseDur - params.pulseDur);
+    // Inter-phase gap
+    // Pin 8 LOW, pin 9 remains HIGH.
+    PORTB = B00000010;   // Turn off pin 8, keep pin 9 on
+    flexibleDelay(params.interPhaseGap);
 
-    PORTB = B00000000; // Turn off pin 9
+    // Phase 2
+    // In A365 Bipolar mode, this second command pulse should produce the opposite polarity.
+    PORTB = B00000011;   // Turn on pin 8 and pin 9
+    flexibleDelay(params.pulseDur);
 
-    // Wait until the next pulse start
-    flexibleDelay(params.pulseDelay - params.widePulseDur);
+    // End of biphasic pair
+    PORTB = B00000000;   // Turn off pin 8 and pin 9
+
+    // Delay after the biphasic pair.
+    // 60 us + 10 us + 60 us + 9870 us = 10 ms total from phase-1 start to next phase-1 start.
+    flexibleDelay(params.pulsePeriod);
   }
 }
