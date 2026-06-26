@@ -96,3 +96,8 @@ void runTrain(Params params) {
     flexibleDelay(params.pulsePeriod);
   }
 }
+
+void loadSettings() {
+  // Currently no extra settings need to be loaded.
+  // session1 already uses the default values from parameters.h.
+}

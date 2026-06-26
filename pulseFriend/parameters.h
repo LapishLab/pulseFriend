@@ -19,4 +19,7 @@ struct Params {
 
 Params session1;
 
+// Function declaration
+void loadSettings();
+
 #endif
