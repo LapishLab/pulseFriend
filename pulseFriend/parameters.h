@@ -15,8 +15,10 @@ struct Params {
   unsigned long pulseDur = 3 * samplePeriod;       // 3 samples = 120 us
   unsigned long interPhaseGap = 1 * samplePeriod;  // 1 sample = 40 us
 
-  unsigned long pulsePeriod = stimPeriod - 2 * pulseDur - interPhaseGap;
-  unsigned long widePulseDur = 2 * pulseDur + interPhaseGap; // 7 samples = 280 us
+  unsigned long biphasicPulseDur = 2 * pulseDur + interPhaseGap; // 7 samples = 280 us
+  unsigned long idlePeriod = stimPeriod - biphasicPulseDur;
+
+  unsigned long ephysGateDur = biphasicPulseDur; // gate covers full biphasic pulse
 
   unsigned long trainDur = 2 * s; // 2 seconds
   unsigned int pulseRepeats = stimFreq * (trainDur / s); // number of pulses in 2 s

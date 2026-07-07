@@ -94,9 +94,9 @@ void runTrain(Params params) {
     // End of biphasic pair
     PORTB = B00000000;   // Turn off pin 8 and pin 9
 
-    // Delay after the biphasic pair.
-    // pulseDur + interPhaseGap + pulseDur + pulsePeriod = stimPeriod.
-    flexibleDelay(params.pulsePeriod);
+    // Quiet/idle delay after the biphasic pair.
+    // biphasicPulseDur + idlePeriod = stimPeriod.
+    flexibleDelay(params.idlePeriod);
   }
 }
 
