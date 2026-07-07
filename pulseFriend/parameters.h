@@ -16,15 +16,15 @@ struct Params {
   unsigned long interPhaseGap = 1 * samplePeriod;  // 1 sample = 40 us
 
   unsigned long biphasicPulseDur = 2 * pulseDur + interPhaseGap; // 7 samples = 280 us
-  unsigned long idlePeriod = stimPeriod - biphasicPulseDur;
+  unsigned long idlePeriod = stimPeriod - biphasicPulseDur;      // 243 samples = 9720 us
+  unsigned long ephysGateDur = biphasicPulseDur;                 // gate covers full biphasic pulse
 
-  unsigned long ephysGateDur = biphasicPulseDur; // gate covers full biphasic pulse
+  unsigned long trainDur = 2 * s; // stimulation duration per train
+  unsigned int pulseRepeats = stimFreq * (trainDur / s); // number of pulses per train
 
-  unsigned long trainDur = 2 * s; // 2 seconds
-  unsigned int pulseRepeats = stimFreq * (trainDur / s); // number of pulses in 2 s
+  unsigned long trainDelay = 10 * s; // idle duration between trains
+  unsigned int trainRepeats = 3;     // number of stimulation trains
 
-  unsigned long trainDelay = 0 * ms;
-  unsigned int trainRepeats = 1;
   bool shouldPrintPulse = false;
 };
 

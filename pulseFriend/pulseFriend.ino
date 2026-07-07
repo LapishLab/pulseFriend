@@ -3,7 +3,7 @@
 // Pins
 const int startButtonPin = 2;
 const int outPin = 8;       // TTL command pulse to WPI A365
-const int outWidePin = 9;   // wider pulse, for ephys trigger/gate
+const int outWidePin = 9;   // ephys trigger/gate covering the full biphasic pulse
 
 void setup() {
   Serial.begin(9600);
@@ -24,11 +24,11 @@ void setup() {
 void loop() {
   if (buttonIsPressed()) {
     Serial.println("Button pressed!");
-    Serial.println("---- Running biphasic pulse train ----");
+    Serial.println("---- Running stimulation protocol ----");
 
     runStim(session1);
 
-    Serial.println("---- Pulse train finished ----");
+    Serial.println("---- Stimulation protocol finished ----");
 
     // Prevent repeated stimulation while button is still held down
     while (buttonIsPressed()) {
@@ -62,7 +62,11 @@ void runStim(Params params) {
 
     runTrain(params);
 
-    flexibleDelay(params.trainDelay);
+    // Idle only between trains, not after the final train
+    if (i < params.trainRepeats - 1) {
+      Serial.println("Idling between trains...");
+      flexibleDelay(params.trainDelay);
+    }
   }
 }
 
@@ -96,6 +100,7 @@ void runTrain(Params params) {
 
     // Quiet/idle delay after the biphasic pair.
     // biphasicPulseDur + idlePeriod = stimPeriod.
+    // At 25 kHz sampling: 7 samples + 243 samples = 250 samples.
     flexibleDelay(params.idlePeriod);
   }
 }
