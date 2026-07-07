@@ -43,10 +43,13 @@ bool buttonIsPressed() {
 }
 
 void flexibleDelay(unsigned long t) {
-  if (t < 4000) {
+  while (t >= ms) {
+    delay(1);
+    t -= ms;
+  }
+
+  if (t > 0) {
     delayMicroseconds(t);
-  } else {
-    delay(t / ms);
   }
 }
 
@@ -92,7 +95,7 @@ void runTrain(Params params) {
     PORTB = B00000000;   // Turn off pin 8 and pin 9
 
     // Delay after the biphasic pair.
-    // 60 us + 10 us + 60 us + 9870 us = 10 ms total from phase-1 start to next phase-1 start.
+    // pulseDur + interPhaseGap + pulseDur + pulsePeriod = stimPeriod.
     flexibleDelay(params.pulsePeriod);
   }
 }
