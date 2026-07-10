@@ -3,7 +3,7 @@
 // Pins
 const int startButtonPin = 2;
 const int outPin = 8;       // TTL command pulse to WPI A365
-const int outWidePin = 9;   // ephys trigger/gate covering the full biphasic pulse
+const int outWidePin = 9;   // ephys trigger/gate covering the monophasic pulse
 
 void setup() {
   Serial.begin(9600);
@@ -73,34 +73,23 @@ void runStim(Params params) {
 void runTrain(Params params) {
   for (unsigned int i = 0; i < params.pulseRepeats; i++) {
     if (params.shouldPrintPulse) {
-      Serial.print("Running biphasic pulse pair #");
+      Serial.print("Running monophasic pulse #");
       Serial.print(i + 1);
       Serial.print("/");
       Serial.println(params.pulseRepeats);
     }
 
-    // Phase 1
-    // Pin 8 HIGH sends command pulse to A365.
-    // Pin 9 HIGH opens the wider ephys gate.
+    // Monophasic command pulse.
+    // Pin 8 HIGH sends the command pulse to the A365.
+    // Pin 9 HIGH opens the ephys gate for the same duration.
     PORTB = B00000011;   // Turn on pin 8 and pin 9
     flexibleDelay(params.pulseDur);
 
-    // Inter-phase gap
-    // Pin 8 LOW, pin 9 remains HIGH.
-    PORTB = B00000010;   // Turn off pin 8, keep pin 9 on
-    flexibleDelay(params.interPhaseGap);
-
-    // Phase 2
-    // In A365 Bipolar mode, this second command pulse should produce the opposite polarity.
-    PORTB = B00000011;   // Turn on pin 8 and pin 9
-    flexibleDelay(params.pulseDur);
-
-    // End of biphasic pair
+    // End the pulse and close the ephys gate.
     PORTB = B00000000;   // Turn off pin 8 and pin 9
 
-    // Quiet/idle delay after the biphasic pair.
-    // biphasicPulseDur + idlePeriod = stimPeriod.
-    // At 25 kHz sampling: 7 samples + 243 samples = 250 samples.
+    // Quiet interval. pulseDur + idlePeriod = stimPeriod.
+    // At 25 kHz sampling: 3 samples + 247 samples = 250 samples.
     flexibleDelay(params.idlePeriod);
   }
 }
