@@ -1,9 +1,13 @@
 #include "parameters.h"
 
-// Pins
-const int startButtonPin = 2;
-const int outPin = 8;       // TTL command pulse to WPI A365
-const int outWidePin = 9;   // ephys trigger/gate covering the monophasic pulse
+// Pins (Arduino Uno/Nano ATmega328P)
+const uint8_t startButtonPin = 2;
+const uint8_t outPin = 8;       // TTL command to WPI A365 (PORTB bit 0)
+const uint8_t outWidePin = 9;   // Ephys gate for the full biphasic pulse (PORTB bit 1)
+
+// Direct-port masks for pins 8 and 9.
+const uint8_t commandMask = _BV(PB0);
+const uint8_t gateMask = _BV(PB1);
 
 void setup() {
   Serial.begin(9600);
@@ -13,11 +17,18 @@ void setup() {
   pinMode(outWidePin, OUTPUT);
   pinMode(startButtonPin, INPUT);
 
-  digitalWrite(outPin, LOW);
-  digitalWrite(outWidePin, LOW);
+  PORTB &= ~(commandMask | gateMask);
 
   loadSettings();
 
+  Serial.print("Stim frequency: ");
+  Serial.print(session1.stimFreq);
+  Serial.println(" Hz");
+  Serial.print("Pulses per train: ");
+  Serial.println(session1.pulseRepeats);
+  Serial.print("Train duration: ");
+  Serial.print(session1.trainDur / 1000.0);
+  Serial.println(" ms");
   Serial.println("Setup finished");
 }
 
@@ -30,7 +41,7 @@ void loop() {
 
     Serial.println("---- Stimulation protocol finished ----");
 
-    // Prevent repeated stimulation while button is still held down
+    // Prevent repeated stimulation while the button remains pressed.
     while (buttonIsPressed()) {
       delay(10);
     }
@@ -38,63 +49,109 @@ void loop() {
 }
 
 bool buttonIsPressed() {
-  int buttonState = digitalRead(startButtonPin);
-  return buttonState == HIGH;
+  return digitalRead(startButtonPin) == HIGH;
 }
 
-void flexibleDelay(unsigned long t) {
-  while (t >= ms) {
-    delay(1);
-    t -= ms;
+// Handles delays longer than delayMicroseconds() reliably accepts.
+void flexibleDelay(uint32_t durationUs) {
+  if (durationUs >= 1000UL) {
+    delay(durationUs / 1000UL);
+    durationUs %= 1000UL;
   }
 
-  if (t > 0) {
-    delayMicroseconds(t);
+  if (durationUs > 0) {
+    delayMicroseconds(durationUs);
   }
 }
 
-void runStim(Params params) {
-  for (unsigned int i = 0; i < params.trainRepeats; i++) {
+// Wait until an absolute micros() timestamp. Signed subtraction makes this
+// safe across micros() rollover, provided waits are shorter than ~35 minutes.
+void waitUntil(uint32_t targetTimeUs) {
+  while ((int32_t)(micros() - targetTimeUs) < 0) {
+    // Busy wait for precise pulse timing.
+  }
+}
+
+void runStim(const Params &params) {
+  for (uint16_t train = 0; train < params.trainRepeats; ++train) {
     Serial.print("Running Train #");
-    Serial.print(i + 1);
+    Serial.print(train + 1);
     Serial.print("/");
     Serial.println(params.trainRepeats);
 
     runTrain(params);
 
-    // Idle only between trains, not after the final train
-    if (i < params.trainRepeats - 1) {
+    // Idle only between trains, not after the final train.
+    if (train + 1 < params.trainRepeats) {
       Serial.println("Idling between trains...");
       flexibleDelay(params.trainDelay);
     }
   }
 }
 
-void runTrain(Params params) {
-  for (unsigned int i = 0; i < params.pulseRepeats; i++) {
+void runTrain(const Params &params) {
+  const uint32_t trainStartUs = micros();
+  const uint32_t trainEndUs = trainStartUs + params.trainDur;
+
+  for (uint32_t pulse = 0; pulse < params.pulseRepeats; ++pulse) {
+    // Schedule every onset from the original train start. This prevents
+    // execution time and delay rounding from accumulating across pulses.
+    const uint32_t pulseStartUs = trainStartUs + pulse * params.stimPeriod;
+    waitUntil(pulseStartUs);
+
     if (params.shouldPrintPulse) {
-      Serial.print("Running monophasic pulse #");
-      Serial.print(i + 1);
+      Serial.print("Running biphasic pulse #");
+      Serial.print(pulse + 1);
       Serial.print("/");
       Serial.println(params.pulseRepeats);
     }
 
-    // Monophasic command pulse.
-    // Pin 8 HIGH sends the command pulse to the A365.
-    // Pin 9 HIGH opens the ephys gate for the same duration.
-    PORTB = B00000011;   // Turn on pin 8 and pin 9
+    // Keep the ephys gate HIGH for both phases and the inter-phase gap.
+    PORTB |= gateMask;
+
+    // Phase 1 command pulse.
+    PORTB |= commandMask;
     flexibleDelay(params.pulseDur);
+    PORTB &= ~commandMask;
 
-    // End the pulse and close the ephys gate.
-    PORTB = B00000000;   // Turn off pin 8 and pin 9
+    // Inter-phase gap.
+    flexibleDelay(params.interPhaseGap);
 
-    // Quiet interval. pulseDur + idlePeriod = stimPeriod.
-    // At 25 kHz sampling: 3 samples + 247 samples = 250 samples.
-    flexibleDelay(params.idlePeriod);
+    // Phase 2 command pulse.
+    // This produces a second TTL command pulse. Actual polarity reversal must
+    // be configured in the stimulator or implemented with separate hardware.
+    PORTB |= commandMask;
+    flexibleDelay(params.pulseDur);
+    PORTB &= ~commandMask;
+
+    // Close the ephys gate after the complete biphasic event.
+    PORTB &= ~gateMask;
   }
+
+  // Keep the train boundary fixed at trainDur (2 s by default).
+  waitUntil(trainEndUs);
 }
 
 void loadSettings() {
-  // Currently no extra settings need to be loaded.
-  // session1 already uses the default values from parameters.h.
+  // Recalculate every value derived from stimFreq, sampleRate, or trainDur.
+  // This guarantees consistency after changing a base value in parameters.h.
+  session1.samplePeriod = s / session1.sampleRate;
+  session1.stimPeriod = s / session1.stimFreq;
+  session1.pulseDur = 3UL * session1.samplePeriod;
+  session1.interPhaseGap = session1.samplePeriod;
+  session1.biphasicPulseDur =
+      2UL * session1.pulseDur + session1.interPhaseGap;
+  session1.ephysGateDur = session1.biphasicPulseDur;
+
+  // Use 64-bit arithmetic so multiplication cannot overflow first.
+  session1.pulseRepeats =
+      (uint32_t)(((uint64_t)session1.stimFreq * session1.trainDur) / s);
+
+  // A stimulation event must fit inside one stimulation period.
+  if (session1.biphasicPulseDur >= session1.stimPeriod) {
+    Serial.println("ERROR: biphasic pulse duration must be shorter than stimPeriod.");
+    session1.idlePeriod = 0;
+  } else {
+    session1.idlePeriod = session1.stimPeriod - session1.biphasicPulseDur;
+  }
 }

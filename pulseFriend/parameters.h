@@ -13,17 +13,17 @@ struct Params {
   unsigned long stimPeriod = s / stimFreq;        // 10000 us or 250 samples at 100 Hz
   unsigned long pulseDur = 3 * samplePeriod;       // 3 samples = 120 us
 
-  unsigned long idlePeriod = stimPeriod - pulseDur;       // 247 samples = 9880 us
-  unsigned long ephysGateDur = pulseDur;                 // gate covers monophasic pulse
+  // unsigned long idlePeriod = stimPeriod - pulseDur;       // 247 samples = 9880 us
+  // unsigned long ephysGateDur = pulseDur;                 // gate covers monophasic pulse
 
 
-  // unsigned long interPhaseGap = 1 * samplePeriod;  // 1 sample = 40 us
-  // unsigned long biphasicPulseDur = 2 * pulseDur + interPhaseGap; // 7 samples = 280 us
-  // unsigned long idlePeriod = stimPeriod - biphasicPulseDur;      // 243 samples = 9720 us
-  // unsigned long ephysGateDur = biphasicPulseDur;                 // gate covers full biphasic pulse
+  unsigned long interPhaseGap = 1 * samplePeriod;  // 1 sample = 40 us
+  unsigned long biphasicPulseDur = 2 * pulseDur + interPhaseGap; // 7 samples = 280 us
+  unsigned long idlePeriod = stimPeriod - biphasicPulseDur;      // 243 samples = 9720 us
+  unsigned long ephysGateDur = biphasicPulseDur;                 // gate covers full biphasic pulse
 
   unsigned long trainDur = 2 * s; // stimulation duration per train
-  unsigned int pulseRepeats = stimFreq * (trainDur / s); // number of pulses per train
+  uint32_t pulseRepeats = stimFreq * (trainDur / s); // number of pulses per train
 
   unsigned long trainDelay = 10 * s; // idle duration between trains
   unsigned int trainRepeats = 3;     // number of stimulation trains
